@@ -1,6 +1,7 @@
-import requests
 import hashlib
 import time
+from password_generator import PasswordGenerator
+import requests
 
 
 def request_api_data(query_char):
@@ -26,6 +27,19 @@ def pwned_api_check(password):
     return get_password_leaks_count(response, tail)   #sends all the reponse and tail to the called method as argument
 
 
+def pass_generator():
+    pwo = PasswordGenerator()
+    pwo.minlen = 6  # (Minimum Length)
+    pwo.maxlen = 12  # (Maximum Length)
+    pwo.minuchars = 2  # (Minimum Upper Case Characters)
+    pwo.minlchars = 2  # (Minimum Lower Case Characters)
+    pwo.minnumbers = 2  # (Minimum Numbers)
+    pwo.minschars = 3  # (Minimum special characters)
+    pass_wd = pwo.generate()
+    print(f'Recommended Password : {pass_wd}')
+    print("-" * 100)
+
+
 print("-" * 100)
 print("*" * 35 + " Password Checker Application " + "*" * 35)
 print("-" * 100)
@@ -35,19 +49,48 @@ print(f'The Following Password checker allows you to check if the password was e
       f'This application safely gets data without sending the complete password to the server')
 print("-" * 100)
 time.sleep(2)
-k=0
+k = 0
 while k != 1:
     password = input(f'Please Enter the password to be checked :\t')
+    weak = 'weak'
+    med = 'medium'
+    strong = 'strong'
+
+    if len(password) > 12:
+        print('Caution : Password is too long It must be between 6 and 12 characters')
+
+    elif len(password) < 6:
+        print('Caution : Password is too short It must be between 6 and 12 characters')
+
+    elif len(password) >= 6 and len(password) <= 12:
+        print('Result : Password Length is OK')
+
+        if password.lower() == password or password.upper() == password or password.isalnum() == password:
+            print('Password Strength : Password is ', weak)
+
+        elif password.lower() == password and password.upper() == password or password.isalnum() == password:
+            print('Password Strength : Password is ', med)
+        else:
+            password.lower() == password and password.upper() == password and password.isalnum() == password
+            print('Password Strength : Password is ', strong)
+    print(f'Checking the Number of times the password was hacked :')
+    time.sleep(2)
     count = pwned_api_check(password)
     if count:
-        print(f'\nResult : {password} was found {count} times. Please try some other password')
+        print(f'Result : {password} was found {count} times. Please try some other password')
+        print("-" * 100)
+        recommendation = input(f'Do you want recommendations for a strong password :\t')
+        if recommendation in ['Yes', 'yes', 'YES']:
+            pass_generator()
+        else:
+            pass
     else:
-        print(f'The password {password} can be used and is never hacked')
-    x = input(f'\nDo you want to check more passwords(Yes/No):\t')
+        print(f'The password {password} can be used and was never hacked')
+    x = input(f'Do you want to check more passwords(Yes/No):\t')
     if x in ['No', 'NO', 'no']:
         k = 1
         print("-" * 100)
-        print(f'\nThank you for using the application. Be Secure')
+        print(f'Thank you for using the application. Be Secure')
         print("-" * 100)
     else:
         print("-" * 100)
